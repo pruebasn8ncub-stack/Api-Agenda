@@ -501,7 +501,10 @@ export class AvailabilityService {
                     currentPhaseStart = currentPhaseEnd;
                 }
 
-                if (isValidSlot && currentPhaseStart.getHours() < 21) {
+                // Use Chile timezone to check if the service ends within reasonable hours
+                const endLocalParts = getTimeParts(currentPhaseStart);
+                const endLocalHour = parseInt(endLocalParts.time.split(':')[0], 10);
+                if (isValidSlot && endLocalHour < 21) {
                     slots.push(slotStartTime.toISOString());
                 }
             }
