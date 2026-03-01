@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
     // Disable Image Optimization (not needed for API-only)
     images: {
         unoptimized: true,
