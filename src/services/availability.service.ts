@@ -553,10 +553,11 @@ export class AvailabilityService {
         const durationMinutes = service?.duration_minutes || 60;
 
         // Procesar bloques continuos
+        // end_time = último horario al que puedes AGENDAR (no cuando termina la cita)
         const continuous_blocks: { start_time: string, end_time: string }[] = [];
         if (foundSlots.length > 0) {
             let currentBlockStart = new Date(foundSlots[0]);
-            let currentBlockEnd = addMinutes(currentBlockStart, durationMinutes);
+            let lastSlotInBlock = new Date(foundSlots[0]);
 
             const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Santiago', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 
@@ -566,23 +567,23 @@ export class AvailabilityService {
 
                 if (slotTime.getTime() === expectedNextSlot.getTime()) {
                     // Contiguo, extender fin
-                    currentBlockEnd = addMinutes(slotTime, durationMinutes);
+                    lastSlotInBlock = slotTime;
                 } else {
                     // Se rompió la continuidad, guardar bloque anterior
                     continuous_blocks.push({
                         start_time: formatter.format(currentBlockStart),
-                        end_time: formatter.format(currentBlockEnd)
+                        end_time: formatter.format(lastSlotInBlock)
                     });
 
                     // Iniciar nuevo bloque
                     currentBlockStart = slotTime;
-                    currentBlockEnd = addMinutes(slotTime, durationMinutes);
+                    lastSlotInBlock = slotTime;
                 }
             }
             // Guardar último bloque
             continuous_blocks.push({
                 start_time: formatter.format(currentBlockStart),
-                end_time: formatter.format(currentBlockEnd)
+                end_time: formatter.format(lastSlotInBlock)
             });
         }
 
