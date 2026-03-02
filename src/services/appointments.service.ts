@@ -85,6 +85,25 @@ export class AppointmentsService {
             throw new AppError('No se puede agendar en el pasado', 400, 'INVALID_TIME_RANGE');
         }
 
+        // 0. Check if patient already has a scheduled appointment
+        const checkSupabase = createClient();
+        const { data: existingAppt } = await checkSupabase
+            .from('appointments')
+            .select('id, starts_at, services(name)')
+            .eq('patient_id', payload.patient_id)
+            .eq('status', 'scheduled')
+            .maybeSingle();
+
+        if (existingAppt) {
+            const serviceName = (existingAppt as any).services?.name || 'desconocido';
+            const dateStr = new Date(existingAppt.starts_at).toLocaleDateString('es-CL');
+            throw new AppError(
+                `El paciente ya tiene una cita programada (${serviceName} el ${dateStr}). Cancela o reagenda la cita existente primero.`,
+                409,
+                'PATIENT_ALREADY_HAS_APPOINTMENT'
+            );
+        }
+
         // 1. Engine: allocate resources for ALL phases
         const { allocations, ends_at } = await AvailabilityService.allocateResourcesForService(
             payload.service_id,

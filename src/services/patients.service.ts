@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient as createClient } from '@/lib/supabase/admin';
 import { Patient } from '@/types';
 import { AppError } from '@/lib/errors';
 

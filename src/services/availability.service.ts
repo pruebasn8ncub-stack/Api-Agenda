@@ -148,7 +148,7 @@ export class AvailabilityService {
                     );
                 }
 
-                const allResourceIds = allResources.map(r => r.id);
+                const allResourceIds = (allResources || []).map((r: any) => r.id);
 
                 // Resources already booked by other appointments
                 const { data: bookedAllocations } = await supabase
