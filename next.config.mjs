@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Standalone output for optimized Docker builds
+    output: 'standalone',
     // Disable Image Optimization (not needed for API-only)
     images: {
         unoptimized: true,

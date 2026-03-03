@@ -439,6 +439,12 @@ export class AppointmentsService {
             throw new AppError('La cita ya está cancelada', 409, 'ALREADY_CANCELLED');
         }
 
+        // Delete allocations first (required by DB exclusion constraint to free time slots)
+        await supabase
+            .from('appointment_allocations')
+            .delete()
+            .eq('appointment_id', id);
+
         const { error } = await supabase
             .from('appointments')
             .update({ status: 'cancelled' })
